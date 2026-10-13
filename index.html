@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BMA II - South West : Postpay Battle Area Summary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+/* Layout: header + KPI trio → sticky pill filter (Area / FRM / สาขา) → 3 summary cards → products & root causes → branch ranking → action plan */
+:root{
+  --bg:#efe5d8; --surface:#fbf7f1; --surface2:#f4ece1; --line:#ded1c0;
+  --ink:#2c241c; --muted:#7a6a59; --accent:#1d6670; --accent-soft:#d6e7e6; --sep:#b3a28f;
+  --good:#2f7d3a; --good-bg:#e1efdc; --warn:#a8670f; --warn-bg:#f6e6c9; --bad:#b8382c; --bad-bg:#f6dcd6;
+  --f-display:'Kanit','IBM Plex Sans Thai',system-ui,sans-serif;
+  --f-body:'IBM Plex Sans Thai','Kanit',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1d1814; --surface:#28211b; --surface2:#2f2720; --line:#43382d;
+  --ink:#f1e8dc; --muted:#b09d88; --accent:#6cc0c5; --accent-soft:#21393b; --sep:#7d6d5c;
+  --good:#7fcf86; --good-bg:#1f3322; --warn:#e7b25a; --warn-bg:#3a2e17; --bad:#f08a7e; --bad-bg:#3d2320; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1d1814; --surface:#28211b; --surface2:#2f2720; --line:#43382d;
+  --ink:#f1e8dc; --muted:#b09d88; --accent:#6cc0c5; --accent-soft:#21393b; --sep:#7d6d5c;
+  --good:#7fcf86; --good-bg:#1f3322; --warn:#e7b25a; --warn-bg:#3a2e17; --bad:#f08a7e; --bad-bg:#3d2320; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
+.wrap{max-width:1400px;margin:0 auto;padding-inline:20px;padding-block:18px 48px;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;margin:0;text-wrap:balance}
+.num,table{font-variant-numeric:tabular-nums}
+header.top{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-end;justify-content:space-between}
+header.top h1{font-size:26px;letter-spacing:.2px}
+header.top .sub{color:var(--muted);font-size:13px}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.hk{display:flex;flex-wrap:wrap;gap:12px 26px;align-items:flex-end}
+.hk div{display:flex;flex-direction:column}
+.hk span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.hk strong{font-family:var(--f-display);font-weight:600;font-size:22px;line-height:1.15}
+.btn-theme{border:1px solid var(--line);background:var(--surface);color:var(--accent);border-radius:999px;width:42px;height:42px;padding:0;display:inline-grid;place-items:center;cursor:pointer;transition:transform .2s}
+.btn-theme:hover{border-color:var(--accent);transform:rotate(-12deg)}
+.btn-theme:focus-visible,.pill:focus-visible,tr.shop-row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);
+  padding-block:10px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid var(--line)}
+.fgroup{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-width:0}
+.flabel{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);width:120px;flex:none}
+@media (max-width:600px){.flabel{width:100%}}
+.pill{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.pill:hover{border-color:var(--accent)}
+.pill.on{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.pill .d{width:8px;height:8px;border-radius:50%;flex:none}
+.pill .t{font-size:10.5px;opacity:.75}
+.d.g{background:var(--good)} .d.w{background:var(--warn)} .d.r{background:var(--bad)}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:1100px){.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){.grid3,.grid2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.ch .eyebrow{display:block}
+.ch h3{font-size:16px;margin-top:2px}
+.big{font-family:var(--f-display);font-size:38px;font-weight:600;line-height:1}
+.bigrow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.bigrow .u{font-size:14px;color:var(--muted);margin-left:6px;font-weight:400}
+.bigrow .tg{font-size:13px;color:var(--muted)}
+.bar{position:relative;height:9px;border-radius:99px;background:var(--surface2);border:1px solid var(--line)}
+.bar>i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:var(--accent)}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:11.5px;color:var(--muted)}
+.legend i{display:inline-block;width:16px;height:0;border-top:2px solid var(--accent);vertical-align:middle;margin-right:5px}
+.legend i.dash{border-top:2px dashed var(--sep)}
+.kvl{display:flex;flex-direction:column;background:var(--surface2);border-radius:10px;padding:6px 12px}
+.kvl .row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.kvl .row:last-child{border-bottom:0}
+.kvl .row b{font-weight:600}
+.chip{display:inline-block;border-radius:6px;padding:1px 7px;font-size:12px;font-weight:600}
+.g{color:var(--good)} .r{color:var(--bad)} .w{color:var(--warn)}
+.chip.g{background:var(--good-bg)} .chip.r{background:var(--bad-bg)} .chip.w{background:var(--warn-bg)}
+.note{border:1px solid var(--line);background:var(--accent-soft);border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.6}
+.note b{color:var(--accent);font-weight:600}
+.note.bad{background:var(--bad-bg);border-color:transparent}
+.note.bad b{color:var(--bad)}
+.note .m{color:var(--muted);display:block;margin-top:2px}
+.conv{text-align:center;display:flex;flex-direction:column;gap:2px;padding-block:4px}
+.conv .big{font-size:48px;color:var(--good)}
+.conv .s{color:var(--muted);font-size:12.5px}
+.dayrow{display:flex;justify-content:space-between;align-items:center;background:var(--surface2);border-radius:9px;padding:8px 12px;font-size:13px}
+.dayrow b{font-weight:600}
+.tbl-wrap{overflow-x:auto;min-width:0}
+table{border-collapse:collapse;width:100%}
+th,td{padding:7px 9px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font-family:var(--f-display);font-weight:500;font-size:12px;color:var(--muted);background:var(--surface2)}
+th:first-child,td:first-child{text-align:left}
+td.l,th.l{text-align:left}
+.card th,.card td{padding:6px 6px}
+.card .chip{padding:1px 5px}
+tr.total td{font-weight:600;border-top:2px solid var(--line);border-bottom:0}
+tr.shop-row{cursor:pointer}
+tr.shop-row:hover td{background:var(--surface2)}
+tr.sel td{background:var(--accent-soft)!important}
+.cell-sub{display:block;font-size:11px;color:var(--muted);font-weight:400}
+.mini{font-size:12px}
+.rc{display:grid;grid-template-columns:minmax(0,1fr) minmax(90px,38%) 74px;gap:6px 12px;align-items:center;font-size:13px}
+.rc .tag{font-size:10.5px;border-radius:5px;padding:0 6px;margin-left:6px;white-space:nowrap;font-weight:600}
+.tag.p{background:var(--warn-bg);color:var(--warn)} .tag.x{background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.rc .rb{height:8px;border-radius:99px;background:var(--surface2);position:relative;overflow:hidden}
+.rc .rb i{position:absolute;inset:0 auto 0 0;border-radius:99px}
+.rc .rb i.p{background:var(--warn)} .rc .rb i.x{background:var(--sep)}
+.rc .v{text-align:right;font-variant-numeric:tabular-nums}
+.rc .v small{color:var(--muted)}
+section.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+section.panel.plan{border-color:var(--accent)}
+.panel-h h2{font-size:19px}
+.panel-h p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+.acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:1000px){.acts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.acts{grid-template-columns:1fr}}
+.act{border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.act h3{font-size:14.5px}
+.act h3 span{color:var(--accent);margin-right:6px}
+.act p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.act p b{color:var(--ink);font-weight:600}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;align-items:center;background:var(--surface2);border-radius:10px;padding:10px 14px;font-size:13px}
+.badge{background:var(--accent);color:var(--surface);border-radius:999px;padding:2px 10px;font-size:11.5px;font-weight:600}
+.legend-ach{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head><body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="eyebrow">BMA II · South West · Postpay Battle</div>
+    <h1 id="ttl">BMA II - South West : Postpay Battle Area Summary</h1>
+    <div class="sub" id="subline"></div>
+  </div>
+  <div class="hk">
+    <div><span>Target Battle</span><strong class="num" id="hT"></strong></div>
+    <div><span>Actual</span><strong class="num" id="hA"></strong></div>
+    <div><span>Ach.</span><strong class="num" id="hP"></strong></div>
+    <button class="btn-theme" id="themeBtn" type="button" aria-label="สลับธีมสว่าง/มืด" title="สลับธีมสว่าง/มืด"></button>
+  </div>
+</header>
+
+<nav class="filters" id="filters" aria-label="เลือกมุมมอง"></nav>
+
+<div class="grid3">
+  <div class="card" id="cTA"></div>
+  <div class="card" id="cST"></div>
+  <div class="card" id="cCV"></div>
+</div>
+<div class="grid2">
+  <div class="card" id="cPC"></div>
+  <div class="card" id="cRC"></div>
+</div>
+
+<section class="panel">
+  <div class="panel-h"><h2>Branch Ranking</h2><p>เรียงตาม %Ach Battle · คลิกแถวเพื่อดูรายละเอียดสาขา (คลิกซ้ำเพื่อกลับภาพรวม)</p></div>
+  <div class="tbl-wrap"><table id="rank"></table></div>
+  <div class="legend-ach">
+    <span><span class="chip g">≥100%</span> ถึงเป้า</span>
+    <span><span class="chip w">80–99%</span> ใกล้เป้า</span>
+    <span><span class="chip r">&lt;80%</span> ต่ำกว่าเป้า</span>
+    <span>Target = Target Battle 2 วัน (12–13 ต.ค.) · Actual = REVENUE (Net Amount) จาก Raw Data · ARPU = Actual ÷ เคสที่ปิดได้</span>
+  </div>
+</section>
+
+<section class="panel plan">
+  <div class="panel-h"><h2>Action Plan &amp; Recovery <span id="planScope" style="font-size:14px;color:var(--muted)"></span></h2><p>เรียงตามผลกระทบต่อ Gap · ตัวเลขคำนวณจากข้อมูล Battle รอบนี้</p></div>
+  <div class="acts" id="acts"></div>
+  <div class="foot" id="foot"></div>
+</section>
+</div>
+<script>
+const D={"shops":[{"c":"80100483","n":"The Mall Thapra","t":"Matching","frm":"","tg":18019},{"c":"80100484","n":"The Mall Bangkae 2Fl.","t":"Matching","frm":"","tg":29392},{"c":"80100565","n":"Central Rama 2","t":"Matching","frm":"","tg":26708},{"c":"80100626","n":"Central Pinklao 3Fl.","t":"Matching","frm":"","tg":28881},{"c":"80100928","n":"Seacon Bangkae","t":"Matching","frm":"","tg":18530},{"c":"80101679","n":"Seacon Bangkae (D)","t":"COCO","frm":"","tg":3450},{"c":"80100566","n":"Central Rama 2 (H)","t":"Non Matching","frm":"วรรษิษฐา ด๊อคมาโนวิค","tg":1534},{"c":"80100736","n":"Lotus's Bangpakok","t":"Non Matching","frm":"วรรษิษฐา ด๊อคมาโนวิค","tg":1278}],"recs":[["80100484",12,"Service To Sale",1,"MNP","",333,"12809271"],["80100626",12,"Walk-In",1,"MNP","",399,"010N9114"],["80100626",12,"Walk-In",1,"MNP","",399,"01054343"],["80100626",12,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"01067834"],["80100626",12,"Walk-In",0,"Sim Only","ใช้งานน้อยเลยไม่อยากใช้รายเดือน",0,"01067834"],["80100626",12,"Walk-In",0,"Migrate","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"010N3909"],["80100626",12,"Walk-In",0,"Migrate","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"010N3909"],["80100626",12,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL Dtac",0,"01054343"],["80100626",12,"Walk-In",0,"Sim Only","ลูกค้าใช้เบอร์เดิม",0,"010N3909"],["80100626",12,"Walk-In",0,"Sim Only","Package รายเดือนยังไม่ถูกใจ",0,"01054343"],["80100565",12,"Service To Sale",1,"MNP","",333,"12810468"],["80100626",12,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"01054343"],["80100565",12,"Service To Sale",0,"Migrate","ติดปัญหาเรื่องเอกสาร",0,"01032631"],["80100626",12,"Walk-In",0,"Migrate","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"010N3909"],["80100626",12,"Walk-In",0,"Migrate","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"010N3909"],["80100626",12,"Service To Sale",0,"Migrate","ติดปัญหาเรื่องเอกสาร",0,"010N9114"],["80100626",12,"Service To Sale",0,"Device Bundling","ลูกค้าใช้เบอร์เดิม",0,"010N9114"],["80100626",12,"Social Media",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"010N9114"],["80100626",12,"Service To Sale",0,"Sim Only","ซื้อเป็นเครื่องเปล่า",0,"010N9114"],["80100928",12,"Service To Sale",1,"Migrate","",499,"12808323"],["80100484",12,"Walk-In",0,"Migrate","ลูกค้าเป็น BL True",0,"01091702"],["80100484",12,"Walk-In",0,"Migrate","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"01091702"],["80100626",12,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL Dtac",0,"010H6222"],["80100626",12,"Walk-In",0,"Device Bundling","สมัครสินเชื่อไม่ผ่าน",0,"01067834"],["80100626",12,"Walk-In",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"01067834"],["80100626",12,"Service To Sale",1,"Migrate","",499,"01087604"],["80100483",12,"Walk-In",1,"MNP","",349,"01046971"],["80100626",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",399,"01067834"],["80100484",12,"Walk-In",0,"Migrate","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"01091702"],["80100565",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",339,"12809873"],["80100565",12,"Service To Sale",0,"Sim Only","ลูกค้าใช้เบอร์เดิม",0,"010H9700"],["80100565",12,"Service To Sale",0,"Migrate","ติดปัญหาเรื่องเอกสาร",0,"12808759"],["80100565",12,"Service To Sale",0,"Migrate","ลูกค้าเป็น BL True",0,"01078205"],["80100565",12,"Service To Sale",0,"Sim Only","ติดปัญหาเรื่องเอกสาร",0,"01055203"],["80100484",12,"Service To Sale",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",699,"01047197"],["80100484",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",599,"01075152"],["80100484",12,"Service To Sale",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",499,"01040851"],["80100626",12,"Walk-In",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"01067834"],["80100565",12,"Service To Sale",0,"Sim Only","Package รายเดือนยังไม่ถูกใจ",0,"01074688"],["80100484",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",599,"01091702"],["80100483",12,"Service To Sale",1,"Migrate","",399,"01070321"],["80100483",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",599,"01029194"],["80100483",12,"Walk-In",0,"Device Bundling","ลูกค้าเป็น BL True",0,"01029194"],["80100626",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",599,"010H5864"],["80100626",12,"Walk-In",1,"Migrate","",399,"010H5864"],["80100626",12,"Walk-In",1,"Migrate","",999,"12809718"],["80100565",12,"Service To Sale",0,"Sim Only","ติดปัญหาเรื่องเอกสาร",0,"01074688"],["80100928",12,"Service To Sale",1,"Migrate","",499,"12808323"],["80100928",12,"Service To Sale",1,"Migrate","",399,"12809514"],["80100928",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",599,"010H1899"],["80100484",12,"Walk-In",0,"Migrate","ใช้งานน้อยเลยไม่อยากใช้รายเดือน",0,"01091702"],["80100928",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",699,"12808323"],["80100565",12,"Service To Sale",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",899,"010H9700"],["80100483",12,"Service To Sale",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",499,"01070321"],["80100626",12,"Service To Sale",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",499,"010N6125"],["80100626",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",399,"01053636"],["80100484",12,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"010H8845"],["80100484",12,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"010H8845"],["80100484",12,"Service To Sale",0,"Sim Only","ซื้อเป็นเครื่องเปล่า",0,"010H8845"],["80100928",12,"Service To Sale",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",699,"01056133"],["80100626",12,"Walk-In",0,"Device Bundling","สมัครสินเชื่อไม่ผ่าน",0,"01067834"],["80100484",12,"Walk-In",1,"Migrate","",699,"12807889"],["80100483",12,"Walk-In",1,"Device Bundling","",599,"01029194"],["80100626",12,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"12810400"],["80100626",12,"Walk-In",0,"Migrate","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12810400"],["80100626",12,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"12810400"],["80100626",12,"Walk-In",0,"Sim Only","ใช้งานน้อยเลยไม่อยากใช้รายเดือน",0,"12810400"],["80100626",12,"Walk-In",0,"Sim Only","ใช้งานน้อยเลยไม่อยากใช้รายเดือน",0,"01067834"],["80100626",12,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"12810400"],["80100484",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",699,"01091702"],["80100626",12,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",699,"12809611"],["80100484",12,"Service To Sale",1,"Device Bundling","",699,"01074655"],["80100484",12,"Service To Sale",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",699,"01040851"],["80100483",12,"Walk-In",0,"Migrate","ลูกค้าเป็น BL Dtac",0,"01029194"],["80100484",12,"Service To Sale",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",499,"01040851"],["80101679",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",699,"39129679"],["80100484",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",399,"12808734"],["80100484",12,"Service To Sale",1,"Device Bundling","",699,"12808124"],["80100626",12,"Walk-In",1,"Migrate","",399,"010H5864"],["80100626",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",1299,"010N6125"],["80100484",12,"Service To Sale",1,"Device Bundling","",699,"010H7011"],["80100565",12,"Walk-In",1,"Device Bundling","",599,"01032631"],["80100928",12,"Service To Sale",0,"Migrate","Package รายเดือนยังไม่ถูกใจ",0,"010H1899"],["80100483",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",599,"01029194"],["80100626",12,"Walk-In",1,"Migrate","",699,"01017152"],["80100626",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",599,"01054343"],["80100626",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",499,"01031765"],["80100626",12,"Walk-In",0,"Device Bundling","ลูกค้าใช้เบอร์เดิม",0,"010H6222"],["80100626",12,"Walk-In",0,"Migrate","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"010H6222"],["80100565",12,"Service To Sale",0,"Device Bundling","ลูกค้าใช้เบอร์เดิม",0,"12808759"],["80100565",12,"Service To Sale",0,"Sim Only","ลูกค้าเป็น BL True",0,"01078205"],["80100565",12,"Service To Sale",0,"Sim Only","ติดปัญหาเรื่องเอกสาร",0,"01032631"],["80100483",12,"Walk-In",0,"Migrate","ลูกค้าเป็น BL True",0,"01076141"],["80100484",12,"Walk-In",1,"Migrate","",599,"01091702"],["80100928",12,"Walk-In",0,"Sim Only","ใช้งานน้อยเลยไม่อยากใช้รายเดือน",0,"1056133"],["80100928",12,"Walk-In",0,"Sim Only","ยังไม่ชอบเบอร์ ที่มีให้เลือก",0,"01056133"],["80100928",12,"Walk-In",0,"Sim Only","ใช้งานน้อยเลยไม่อยากใช้รายเดือน",0,"01056133"],["80100928",12,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"12808323"],["80100928",12,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"12808323"],["80100928",12,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"12808323"],["80100626",12,"Walk-In",0,"Device Bundling","ลูกค้าใช้เบอร์เดิม",0,"01067834"],["80100626",12,"Walk-In",1,"Migrate","",1299,"12809718"],["80100626",12,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"010H6222"],["80100483",12,"Walk-In",0,"Migrate","ลูกค้าเป็น BL True",0,"01076141"],["80100928",12,"Service To Sale",1,"Migrate","",399,"01092552"],["80100565",12,"Service To Sale",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",899,"01074688"],["80100565",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",399,"01046311"],["80100565",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",399,"010H9700"],["80100565",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",399,"01032631"],["80100565",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",399,"12809286"],["80100565",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",333,"12809859"],["80100565",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",399,"01046311"],["80100565",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",399,"01046311"],["80100626",12,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"010H6222"],["80100484",12,"Service To Sale",1,"Device Bundling","",1299,"01040851"],["80100484",12,"Service To Sale",1,"Device Bundling","",1499,"01040851"],["80100484",12,"Service To Sale",1,"Device Bundling","",899,"010H7011"],["80100484",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",449,"010H7011"],["80100626",12,"Walk-In",0,"Migrate","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"010H6222"],["80100928",12,"Service To Sale",1,"Device Bundling","",699,"010H1899"],["80101679",12,"Walk-In",1,"Device Bundling","",499,"12809460"],["80101679",12,"Walk-In",1,"Migrate","",449,"12809460"],["80100483",12,"Walk-In",0,"Migrate","ลูกค้าเป็น BL True",0,"01076141"],["80100483",12,"Walk-In",0,"Migrate","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"01076141"],["80100483",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",299,"01025110"],["80100483",12,"Service To Sale",0,"Sim Only","ลูกค้าเป็น BL True",0,"01025110"],["80100483",12,"Walk-In",1,"Migrate","",299,"01074257"],["80100483",12,"Walk-In",0,"MNP","ลูกค้าเป็น BL True",0,"01074257"],["80100483",12,"Walk-In",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"01074257"],["80100928",12,"Service To Sale",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",699,"12809514"],["80100484",12,"Walk-In",1,"Device Bundling","",699,"01040851"],["80100484",12,"Walk-In",1,"Device Bundling","",699,"01044539"],["80100484",12,"Walk-In",1,"Device Bundling","",1499,"01044539"],["80100626",12,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",399,"01031766"],["80100626",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",499,"12809611"],["80100626",12,"Walk-In",1,"Device Bundling","",699,"010N9114"],["80100736",12,"Walk-In",1,"Device Bundling","",699,"12809915"],["80100566",12,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",899,"010E4430"],["80100484",12,"Walk-In",1,"Sim Only(เบอร์ Mass)","",199,"010H7011"],["80100565",12,"Service To Sale",1,"Device Bundling","",599,"010N8508"],["80100565",12,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",399,"01049308"],["80100484",12,"Walk-In",1,"Device Bundling","",1399,"010H7011"],["80100483",13,"Service To Sale",0,"Sim Only","ลูกค้าเป็น BL True",0,"01025110"],["80100483",13,"Service To Sale",0,"Sim Only","ติดปัญหาเรื่องเอกสาร",0,"01025110"],["80100565",13,"Service To Sale",1,"Migrate","",599,"12809394"],["80100565",13,"Service To Sale",1,"Migrate","",699,"01055203"],["80100565",13,"Service To Sale",0,"Sim Only","ลูกค้าเป็น BL True",0,"01055203"],["80100565",13,"Service To Sale",0,"Device Bundling","ลูกค้าเป็น BL True",0,"01032631"],["80100626",13,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL Dtac",0,"01087604"],["80100626",13,"Walk-In",0,"Migrate","ลูกค้าเป็น BL True",0,"01087604"],["80101679",13,"Walk-In",0,"Sim Only","ใช้งานน้อยเลยไม่อยากใช้รายเดือน",0,"39129679"],["80101679",13,"Walk-In",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"39129679"],["80100483",13,"Service To Sale",0,"MNP","ลูกค้าเป็น BL True",0,"01025110"],["80101679",13,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"39129679"],["80100565",13,"Service To Sale",0,"Migrate","ติดปัญหาเรื่องเอกสาร",0,"010G9536"],["80101679",13,"Walk-In",1,"Migrate","",399,"39129679"],["80100483",13,"Walk-In",0,"Migrate","ลูกค้าเป็น BL True",0,"01086107"],["80100928",13,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",1499,"01092552"],["80100928",13,"Walk-In",1,"Device Bundling","",699,"12809514"],["80100483",13,"Service To Sale",0,"Migrate","ลูกค้าเป็น BL True",0,"01025110"],["80101679",13,"Walk-In",0,"Sim Only","ติดปัญหาเรื่องเอกสาร",0,"12810190"],["80101679",13,"Walk-In",0,"Migrate","ติดปัญหาเรื่องเอกสาร",0,"12810190"],["80101679",13,"Walk-In",0,"Device Bundling","ติดปัญหาเรื่องเอกสาร",0,"12810190"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12810405"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12810405"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12810405"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12810405"],["80100484",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",899,"010H8845"],["80100484",13,"Service To Sale",1,"Migrate","",899,"010H8845"],["80100484",13,"Service To Sale",1,"Migrate","",599,"010H5349"],["80100483",13,"Walk-In",0,"Migrate","ลูกค้าเป็น BL Dtac",0,"01086107"],["80100565",13,"Service To Sale",0,"Migrate","ลูกค้าเป็น BL True",0,"12808061"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12810405"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12810405"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12810405"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12810405"],["80100565",13,"Walk-In",0,"Device Bundling","ชาวต่างชาติ พักอาศัยชั่วคราว",0,"12809394"],["80100565",13,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"12809394"],["80100565",13,"Walk-In",0,"MNP","ลูกค้าเป็น BL Dtac",0,"12809394"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12810405"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12810405"],["80101679",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",299,"12810007"],["80101679",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",699,"12810007"],["80100626",13,"Walk-In",1,"MNP","",899,"010H6222"],["80100626",13,"Walk-In",1,"Device Bundling","",699,"01054343"],["80100626",13,"Walk-In",1,"Migrate","",699,"010H7119"],["80100626",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",499,"01054343"],["80100626",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",699,"01087032"],["80100565",13,"Service To Sale",0,"Device Bundling","ลูกค้าใช้เบอร์เดิม",0,"010N8508"],["80100565",13,"Service To Sale",0,"Device Bundling","ลูกค้าใช้เบอร์เดิม",0,"010N8508"],["80100484",13,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",1199,"01044539"],["80101679",13,"Walk-In",1,"Migrate","",444,"12810007"],["80100484",13,"Walk-In",1,"Device Bundling","",899,"01052561"],["80100565",13,"Service To Sale",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",499,"010N8508"],["80100928",13,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",399,"12808323"],["80100483",13,"Walk-In",1,"Migrate","",599,"01070321"],["80100565",13,"Service To Sale",0,"Device Bundling","ลูกค้าใช้เบอร์เดิม",0,"010N8508"],["80100565",13,"Service To Sale",0,"Migrate","ลูกค้าเป็น BL True",0,"01092766"],["80100565",13,"Service To Sale",0,"Migrate","ติดปัญหาเรื่องเอกสาร",0,"01049308"],["80100928",13,"Service To Sale",1,"Device Bundling","",699,"12809514"],["80100483",13,"Walk-In",1,"Migrate","",399,"01074257"],["80100565",13,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",899,"010N8508"],["80100565",13,"Service To Sale",0,"Migrate","ลูกค้าเป็น BL True",0,"010N8508"],["80101679",13,"Walk-In",1,"Migrate","",374,"12810007"],["80100565",13,"Service To Sale",0,"Device Bundling","ลูกค้าใช้เบอร์เดิม",0,"01032631"],["80100565",13,"Service To Sale",0,"Migrate","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12808061"],["80100565",13,"Service To Sale",0,"Migrate","ติดปัญหาเรื่องเอกสาร",0,"12808759"],["80100566",13,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",699,"010E4430"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12809514"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12809514"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12809514"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12809514"],["80100928",13,"Service To Sale",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"12809514"],["80101679",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",699,"12810190"],["80100483",13,"Walk-In",0,"Migrate","ลูกค้าเป็น BL True",0,"01073814"],["80100483",13,"Walk-In",0,"MNP","ลูกค้าเป็น BL True",0,"01073814"],["80100565",13,"Service To Sale",0,"Sim Only","ลูกค้าเป็น BL True",0,"010N8508"],["80101679",13,"Walk-In",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"39129679"],["80101679",13,"Walk-In",0,"Sim Only","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"39129679"],["80100928",13,"Service To Sale",1,"Migrate","",350,"01056133"],["80100565",13,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",699,"010N8508"],["80100483",13,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",499,"01029194"],["80100626",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",699,"010H7119"],["80100626",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",899,"010H7119"],["80100626",13,"Walk-In",1,"Device Bundling","",699,"010H5864"],["80100626",13,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",499,"010H5864"],["80100626",13,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",399,"01084501"],["80100626",13,"Walk-In",1,"Device Bundling","",699,"01067834"],["80100626",13,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",699,"12810400"],["80100483",13,"Walk-In",0,"Migrate","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"01073814"],["80100483",13,"Walk-In",0,"Migrate","Package รายเดือนยังไม่ถูกใจ",0,"01073814"],["80100483",13,"Service To Sale",0,"Migrate","ลูกค้าเป็น BL True",0,"01025110"],["80100565",13,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",449,"01049308"],["80100565",13,"Service To Sale",0,"Device Bundling","ลูกค้าใช้เบอร์เดิม",0,"01092766"],["80100565",13,"Service To Sale",0,"Device Bundling","ลูกค้าเป็น BL True",0,"010N8508"],["80100565",13,"Service To Sale",0,"Sim Only","ลูกค้าเป็น BL True",0,"01032631"],["80100484",13,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",499,"01052561"],["80100484",13,"Walk-In",1,"Migrate","",599,"010F8586"],["80100565",13,"Service To Sale",0,"Migrate","ลูกค้าเป็น BL True",0,"12808061"],["80100484",13,"Service To Sale",1,"Migrate","",599,"01076375"],["80100484",13,"Service To Sale",1,"Device Bundling","",699,"12808124"],["80100484",13,"Service To Sale",1,"Migrate","",599,"01027571"],["80100565",13,"Service To Sale",0,"Device Bundling","ซื้อเป็นเครื่องเปล่า",0,"010N8508"],["80100565",13,"Service To Sale",0,"Migrate","ลูกค้าเป็น BL True",0,"12808061"],["80100626",13,"Service To Sale",0,"Device Bundling","ใช้เติมเงิน รู้สึกประหยัดกว่า",0,"01069491"],["80100626",13,"Service To Sale",0,"Migrate","ลูกค้าเป็น BL True",0,"01069491"],["80100626",13,"Service To Sale",0,"Sim Only","ลูกค้าใช้เบอร์เดิม",0,"01069491"],["80100565",13,"Service To Sale",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",899,"12809880"],["80100483",13,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL Dtac",0,"01029194"],["80100483",13,"Walk-In",0,"Device Bundling","ลูกค้าเป็น BL Dtac",0,"01029194"],["80100483",13,"Walk-In",0,"Migrate","ลูกค้าเป็น BL Dtac",0,"01029194"],["80100483",13,"Walk-In",0,"Sim Only","Package รายเดือนยังไม่ถูกใจ",0,"01029194"],["80100483",13,"Service To Sale",0,"Migrate","ลูกค้าเป็น BL True",0,"01025110"],["80100928",13,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",1299,"01067117"],["80100565",13,"Walk-In",0,"Sim Only","ติดปัญหาเรื่องเอกสาร",0,"01032631"],["80100565",13,"Service To Sale",0,"Device Bundling","ลูกค้าใช้เบอร์เดิม",0,"01055203"],["80100565",13,"Service To Sale",0,"Migrate","ลูกค้าเป็น BL True",0,"01078205"],["80100565",13,"Service To Sale",0,"Sim Only","ลูกค้าเป็น BL True",0,"12808759"],["80100565",13,"Service To Sale",1,"Migrate","",399,"12809880"],["80100484",13,"Walk-In",0,"Migrate","ลูกค้าเป็น BL True",0,"01040454"],["80100484",13,"Walk-In",0,"Sim Only","ลูกค้าเป็น BL True",0,"01040454"],["80100484",13,"Walk-In",0,"Device Bundling","ซื้อเป็นเครื่องเปล่า",0,"01040454"],["80100483",13,"Walk-In",1,"Device Bundling","",699,"01029194"],["80100483",13,"Walk-In",0,"Migrate","ลูกค้าเป็น BL True",0,"01086107"],["80100484",13,"Walk-In",1,"Device Bundling","",1699,"01044539"],["80100483",13,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",1499,"01070321"],["80100483",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",399,"01073814"],["80100484",13,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",499,"01040454"],["80100484",13,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",499,"010N4810"],["80100484",13,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",699,"010H8845"],["80100483",13,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",399,"01025110"],["80100483",13,"Walk-In",0,"MNP","ใช้งานน้อยเลยไม่อยากใช้รายเดือน",0,"01073814"],["80100928",13,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",1299,"01092552"],["80100626",13,"Walk-In",1,"Migrate","",399,"01017152"],["80100626",13,"Walk-In",1,"Migrate","",399,"010H1618"],["80100626",13,"Walk-In",1,"Migrate","",399,"12809611"],["80100484",13,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",1699,"01040454"],["80100484",13,"Walk-In",1,"Sim Only(เบอร์สวย-เบอร์มงคล)","",499,"01075152"],["80100626",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",699,"12809478"],["80100626",13,"Walk-In",1,"Migrate","",399,"01069491"],["80100483",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",399,"01025110"],["80100483",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",399,"01086107"],["80100483",13,"Walk-In",0,"Migrate","ใช้งานน้อยเลยไม่อยากใช้รายเดือน",0,"01073814"],["80100565",13,"Service To Sale",1,"Sim Only(เบอร์ Mass)","",2199,"12809859"],["80100626",13,"Walk-In",1,"Sim Only(เบอร์ Mass)","",1199,"12810397"],["80100484",13,"Walk-In",1,"Migrate","",599,"01027571"],["80100565",13,"Service To Sale",1,"Migrate","",599,"01032631"],["80100565",13,"Service To Sale",1,"Migrate","",2199,"12808061"]]};
+const SHOPS=D.shops, R=D.recs.map(r=>{const t=r[4]||'';let grp=t,sub='';
+  if(t.startsWith('Sim Only')){grp='Sim Only';const m=t.match(/\((.*)\)/);sub=m?m[1].replace('เบอร์สวย-เบอร์มงคล','เบอร์สวย-มงคล'):''}
+  return {c:r[0],d:r[1],ch:r[2],ok:r[3]===1,ty:grp,sub,rs:r[5],rev:+r[6]||0,sid:r[7]}});
+const DAYS=[12,13], DLBL={12:'12 ต.ค.',13:'13 ต.ค.'};
+const FRM=SHOPS.find(s=>s.frm)?.frm||'';
+const PERS=new Set(['ใช้เติมเงิน รู้สึกประหยัดกว่า','ใช้งานน้อยเลยไม่อยากใช้รายเดือน','Package รายเดือนยังไม่ถูกใจ','ลูกค้าใช้เบอร์เดิม','ซื้อเป็นเครื่องเปล่า','ยังไม่ชอบเบอร์ ที่มีให้เลือก']);
+const nf=n=>Math.round(n).toLocaleString('en-US');
+const pf=(x,d=1)=>(isFinite(x)?(x*100).toFixed(d):'0')+'%';
+const sg=n=>(n>0?'+':n<0?'−':'')+nf(Math.abs(n));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cls=a=>a>=1?'g':a>=.8?'w':'r';
+const typeLabel=t=>t==='COCO'?'DTAC COCO':t;
+const byShop=Object.fromEntries(SHOPS.map(s=>[s.c,s]));
+
+function agg(list){const a={n:list.length,ok:0,rev:0,day:{},type:{},ch:{},rs:{},sub:{},price:{}};
+  DAYS.forEach(d=>a.day[d]={n:0,ok:0,rev:0});
+  for(const r of list){a.rev+=r.rev;const dd=a.day[r.d];dd.n++;dd.rev+=r.rev;
+    const T=a.type[r.ty]||(a.type[r.ty]={n:0,ok:0,rev:0});T.n++;T.rev+=r.rev;
+    const C=a.ch[r.ch]||(a.ch[r.ch]={n:0,ok:0,rev:0});C.n++;C.rev+=r.rev;
+    if(r.ok){a.ok++;dd.ok++;T.ok++;C.ok++;if(r.sub)a.sub[r.sub]=(a.sub[r.sub]||0)+1;a.price[r.rev]=(a.price[r.rev]||0)+1}
+    else if(r.rs){a.rs[r.rs]=(a.rs[r.rs]||0)+1}}
+  a.rate=a.n?a.ok/a.n:0;a.arpu=a.ok?a.rev/a.ok:0;return a}
+function shopStat(s){const a=agg(R.filter(r=>r.c===s.c));a.tg=s.tg;a.ach=a.rev/s.tg;a.gap=a.rev-s.tg;
+  a.top=Object.entries(a.rs).sort((x,y)=>y[1]-x[1])[0];return a}
+const SS=Object.fromEntries(SHOPS.map(s=>[s.c,shopStat(s)]));
+const AREA=(()=>{const a=agg(R);a.tg=SHOPS.reduce((t,s)=>t+s.tg,0);a.ach=a.rev/a.tg;a.gap=a.rev-a.tg;return a})();
+
+let scope={k:'area'};
+try{const s=JSON.parse(localStorage.getItem('battleScope')||'null');if(s&&(s.k!=='shop'||byShop[s.c]))scope=s}catch(e){}
+const inScope=()=>scope.k==='area'?SHOPS:scope.k==='frm'?SHOPS.filter(s=>s.frm):SHOPS.filter(s=>s.c===scope.c);
+const scopeName=()=>scope.k==='area'?'BMA II - South West':scope.k==='frm'?'FRM '+FRM.split(' ')[0]+' (Non Matching)':byShop[scope.c].n;
+
+function filters(){const f=document.getElementById('filters');
+  const pill=(on,attr,html)=>`<button type="button" class="pill${on?' on':''}" ${attr}>${html}</button>`;
+  const shopPill=s=>pill(scope.k==='shop'&&scope.c===s.c,`data-shop="${s.c}"`,`<i class="d ${cls(SS[s.c].ach)}"></i>${esc(s.n)}<span class="t">${pf(SS[s.c].ach,0)}</span>`);
+  const row=(lbl,list)=>list.length?`<div class="fgroup"><span class="flabel">${lbl}</span>${list.map(shopPill).join('')}</div>`:'';
+  f.innerHTML=`<div class="fgroup"><span class="flabel">Area</span>${pill(scope.k==='area','data-k="area"','สรุป Area (1 หน้า)')}${FRM?pill(scope.k==='frm','data-k="frm"','สรุป FRM '+esc(FRM.split(' ')[0])+' (Non Matching)'):''}</div>`
+   +row('Matching',SHOPS.filter(s=>s.t==='Matching'))
+   +row('Non Matching · FRM',SHOPS.filter(s=>s.t==='Non Matching'))
+   +row('DTAC COCO',SHOPS.filter(s=>s.t==='COCO'));
+  f.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>setScope({k:b.dataset.k}));
+  f.querySelectorAll('[data-shop]').forEach(b=>b.onclick=()=>setScope(scope.k==='shop'&&scope.c===b.dataset.shop?{k:'area'}:{k:'shop',c:b.dataset.shop}));}
+function setScope(s){scope=s;try{localStorage.setItem('battleScope',JSON.stringify(s))}catch(e){};render()}
+
+function lineChart(A,tg){const W=320,H=170,pl=8,pr=8,pt=26,pb=26;const dt=tg/2;
+  const vals=DAYS.map(d=>A.day[d].rev);const max=Math.max(dt,...vals)*1.18||1;
+  const x=i=>pl+40+i*(W-pl-pr-80),y=v=>pt+(H-pt-pb)*(1-v/max);
+  const pts=vals.map((v,i)=>[x(i),y(v)]);
+  const grid=[0,.5,1].map(f=>{const v=max*f;return `<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`}).join('');
+  const area=`M${pts[0][0]},${y(0)} L${pts.map(p=>p.join(',')).join(' L')} L${pts[pts.length-1][0]},${y(0)} Z`;
+  const dots=pts.map((p,i)=>{const a=vals[i]/dt;return `<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="2.5"/>
+    <text x="${p[0]}" y="${p[1]-11}" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">${nf(vals[i])}</text>
+    <text x="${p[0]}" y="${H-8}" text-anchor="middle" font-size="11.5" fill="var(--muted)">${DLBL[DAYS[i]]} · <tspan fill="var(--${a>=1?'good':a>=.8?'warn':'bad'})">${pf(a,0)}</tspan></text>`}).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="ยอดรายวันเทียบเป้าต่อวัน">${grid}
+   <line x1="${pl}" x2="${W-pr}" y1="${y(dt)}" y2="${y(dt)}" stroke="var(--sep)" stroke-width="1.5" stroke-dasharray="5 4"/>
+   <text x="${W-pr}" y="${y(dt)-5}" text-anchor="end" font-size="10.5" fill="var(--muted)">เป้าต่อวัน ${nf(dt)}</text>
+   <path d="${area}" fill="var(--accent)" fill-opacity=".12"/>
+   <polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>${dots}</svg>`}
+
+function render(){
+  filters();const shops=inScope(), codes=new Set(shops.map(s=>s.c));
+  const A=agg(R.filter(r=>codes.has(r.c)));A.tg=shops.reduce((t,s)=>t+s.tg,0);A.ach=A.rev/A.tg;A.gap=A.rev-A.tg;
+  const nm=scopeName();
+  document.getElementById('subline').textContent=`Postpay Battle Review: 12–13 ตุลาคม 2026 · ${scope.k==='shop'?nm+' · '+typeLabel(byShop[scope.c].t):nm+' · '+shops.length+' สาขา'}`;
+  document.getElementById('hT').textContent=nf(A.tg)+' ฿';
+  document.getElementById('hA').textContent=nf(A.rev)+' ฿';
+  const hP=document.getElementById('hP');hP.textContent=pf(A.ach);hP.className='num '+cls(A.ach);
+
+  // Card 1
+  document.getElementById('cTA').innerHTML=`<div class="ch"><span class="eyebrow">Target vs Actual (Battle 2 วัน)</span><h3>ยอดขาย Postpay เทียบเป้า</h3></div>
+   <div class="bigrow"><div><span class="big num">${nf(A.rev)}</span><span class="u">บาท</span></div><span class="tg num">Target: ${nf(A.tg)}</span></div>
+   <div class="bar" title="${pf(A.ach)}"><i style="width:${Math.min(100,A.ach*100)}%;background:var(--${A.ach>=1?'good':A.ach>=.8?'warn':'bad'})"></i></div>
+   <div class="chart">${lineChart(A,A.tg)}</div>
+   <div class="legend"><span><i></i>ยอดขายรายวัน (บาท)</span><span><i class="dash"></i>เป้าต่อวัน = Target ÷ 2</span></div>
+   <div class="kvl num">
+    <div class="row"><span>Achievement</span><b class="${cls(A.ach)}">${pf(A.ach)} (${sg(A.gap)})</b></div>
+    <div class="row"><span>ARPU เฉลี่ย</span><b>${nf(A.arpu)} บาท</b></div>
+    ${DAYS.map(d=>{const a=A.day[d].rev/(A.tg/2);return `<div class="row"><span>${DLBL[d]}</span><b class="${cls(a)}">${nf(A.day[d].rev)} บาท · ${pf(a,0)}</b></div>`}).join('')}
+   </div>`;
+
+  // Card 2
+  let rows,head='Type',sub='ผลแยกประเภทสาขา';
+  if(scope.k==='area'){rows=['Matching','Non Matching','COCO'].map(t=>{const ss=SHOPS.filter(s=>s.t===t);const tg=ss.reduce((a,s)=>a+s.tg,0),ac=ss.reduce((a,s)=>a+SS[s.c].rev,0);return {l:typeLabel(t)+` <span class="cell-sub">${ss.length} สาขา</span>`,tg,ac}})}
+  else if(scope.k==='frm'){head='สาขา';sub='ผลแยกรายสาขาของ FRM';rows=shops.map(s=>({l:esc(s.n),tg:s.tg,ac:SS[s.c].rev}))}
+  else{head='วัน';sub='ผลแยกรายวัน (เป้าต่อวัน = Target ÷ 2)';rows=DAYS.map(d=>({l:DLBL[d],tg:A.tg/2,ac:A.day[d].rev}))}
+  const neg=shops.map(s=>SS[s.c]).filter(x=>x.gap<0);const negSum=neg.reduce((a,x)=>a+x.gap,0);
+  const top3=shops.filter(s=>SS[s.c].gap<0).sort((a,b)=>SS[a.c].gap-SS[b.c].gap).slice(0,3);
+  const t3=top3.reduce((a,s)=>a+SS[s.c].gap,0);
+  const hit=shops.filter(s=>SS[s.c].ach>=1).sort((a,b)=>SS[b.c].ach-SS[a.c].ach), near=shops.filter(s=>SS[s.c].ach>=.8&&SS[s.c].ach<1);
+  let notes='';
+  if(scope.k!=='shop'){
+    notes+=top3.length?`<div class="note"><b>Gap กระจุกตัว:</b> ${top3.map(s=>`${esc(s.n)} (${sg(SS[s.c].gap)})`).join(', ')} ${top3.length>1?`รวมกันคิดเป็น <b>${pf(t3/negSum,0)}</b> ของ Gap ติดลบทั้งหมด ${sg(negSum)}`:''}</div>`:'';
+    notes+=`<div class="note"><b>สาขาที่ทำได้ตามเป้า:</b> ${hit.length?hit.map(s=>`${esc(s.n)} ${pf(SS[s.c].ach,0)}`).join(', '):'ยังไม่มี'}${near.length?` · ใกล้เป้า: ${near.map(s=>`${esc(s.n)} ${pf(SS[s.c].ach,0)}`).join(', ')}`:''}</div>`;
+  }else{const s=SS[scope.c];const need=s.gap<0?Math.ceil(-s.gap/(s.arpu||AREA.arpu)):0;
+    notes=`<div class="note"><b>${s.gap>=0?'ทำได้เกินเป้า':'ยังขาดเป้า'}:</b> ${sg(s.gap)} บาท${need?` · เทียบเท่าต้องปิดเพิ่มประมาณ <b>${need} เคส</b> ที่ ARPU ${nf(s.arpu||AREA.arpu)} บาท`:''}</div>
+     <div class="note"><b>อันดับในพื้นที่:</b> ${SHOPS.map(x=>x.c).sort((a,b)=>SS[b].ach-SS[a].ach).indexOf(scope.c)+1} จาก ${SHOPS.length} สาขา · Area ทำได้ ${pf(AREA.ach)}</div>`}
+  document.getElementById('cST').innerHTML=`<div class="ch"><span class="eyebrow">Shop Type &amp; Gap</span><h3>${sub}</h3></div>
+   <div class="tbl-wrap"><table><thead><tr><th>${head}</th><th>Target</th><th>Actual</th><th>Gap</th><th>%Ach</th></tr></thead><tbody>
+   ${rows.map(r=>{const a=r.ac/r.tg;return `<tr><td>${r.l}</td><td>${nf(r.tg)}</td><td>${nf(r.ac)}</td><td class="${r.ac-r.tg>=0?'g':'r'}">${sg(r.ac-r.tg)}</td><td><span class="chip ${cls(a)}">${pf(a)}</span></td></tr>`}).join('')}
+   <tr class="total"><td>รวม</td><td>${nf(A.tg)}</td><td>${nf(A.rev)}</td><td class="${A.gap>=0?'g':'r'}">${sg(A.gap)}</td><td><span class="chip ${cls(A.ach)}">${pf(A.ach)}</span></td></tr>
+   </tbody></table></div>${notes}`;
+
+  // Card 3
+  const d1=A.day[12],d2=A.day[13];const r1=d1.n?d1.ok/d1.n:0,r2=d2.n?d2.ok/d2.n:0;const offCh=d1.n?(d2.n-d1.n)/d1.n:0;const ptCh=(r2-r1)*100;
+  document.getElementById('cCV').innerHTML=`<div class="ch"><span class="eyebrow">Conversion</span><h3>% ปิดการขายรวม${scope.k==='shop'?'สาขา':' '+(scope.k==='frm'?'FRM':'Area')}</h3></div>
+   <div class="conv"><span class="big num" style="color:var(--${A.rate>=AREA.rate||scope.k==='area'?'good':'bad'})">${pf(A.rate)}</span><span class="s num">ปิดได้ ${A.ok} จาก ${A.n} เคสที่นำเสนอ · ARPU ${nf(A.arpu)} บาท</span></div>
+   ${DAYS.map(d=>{const x=A.day[d],rt=x.n?x.ok/x.n:0;return `<div class="dayrow num"><span>${DLBL[d]} (Closed ${x.ok}/${x.n})</span><b class="${rt>=A.rate?'g':'r'}">${pf(rt)}</b></div>`}).join('')}
+   ${scope.k!=='area'?`<div class="dayrow num"><span>ค่าเฉลี่ย Area</span><b>${pf(AREA.rate)}</b></div>`:''}
+   <div class="note"><b>13 ต.ค.</b> นำเสนอ${offCh>=0?'เพิ่มขึ้น':'ลดลง'} ${pf(Math.abs(offCh),0)} เทียบ 12 ต.ค. และ % ปิดการขาย${ptCh>=0?'เพิ่มขึ้น':'ลดลง'} ${Math.abs(ptCh).toFixed(1)} จุด · ยอดขายรายวัน 12 ต.ค. ${nf(d1.rev)} · 13 ต.ค. ${nf(d2.rev)} บาท</div>`;
+
+  // Card 4 Products & Channels
+  const TORD=['Sim Only','Migrate','Device Bundling','MNP'];const types=Object.keys(A.type).sort((a,b)=>(TORD.indexOf(a)+99*(TORD.indexOf(a)<0))-(TORD.indexOf(b)+99*(TORD.indexOf(b)<0)));
+  const chs=Object.keys(A.ch).sort((a,b)=>A.ch[b].n-A.ch[a].n);
+  const tbl=(lbl,keys,obj)=>`<table><thead><tr><th>${lbl}</th><th>นำเสนอ</th><th>ปิดได้</th><th>% Close</th><th>Revenue</th></tr></thead><tbody>${keys.map(k=>{const o=obj[k],rt=o.ok/o.n;return `<tr><td>${esc(k)}</td><td>${o.n}</td><td>${o.ok}</td><td class="${rt>=A.rate?'g':'r'}">${pf(rt)}</td><td>${nf(o.rev)}</td></tr>`}).join('')}</tbody></table>`;
+  const elig=types.filter(t=>A.type[t].n>=3);const low=elig.sort((a,b)=>A.type[a].ok/A.type[a].n-A.type[b].ok/A.type[b].n)[0];
+  const best=[...elig].sort((a,b)=>A.type[b].ok/A.type[b].n-A.type[a].ok/A.type[a].n)[0];
+  const lowRs=low?Object.entries(R.filter(r=>codes.has(r.c)&&!r.ok&&r.ty===low).reduce((m,r)=>(m[r.rs]=(m[r.rs]||0)+1,m),{})).sort((a,b)=>b[1]-a[1])[0]:null;
+  const mix=[...Object.entries(A.sub).map(([k,v])=>[`Sim Only (${k})`,v]),...types.filter(t=>t!=='Sim Only').map(t=>[t,A.type[t].ok])].filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('cPC').innerHTML=`<div class="ch"><span class="eyebrow">Products &amp; Channels</span><h3>% ปิดการขายแยกประเภทการนำเสนอและช่องทาง</h3></div>
+   <div class="tbl-wrap">${tbl('ประเภทการนำเสนอ',types,A.type)}</div><div class="tbl-wrap">${tbl('Channel',chs,A.ch)}</div>
+   ${low?`<div class="note"><b>${esc(low)} ปิดได้ต่ำสุด:</b> นำเสนอ ${A.type[low].n} เคส ปิดได้ ${pf(A.type[low].ok/A.type[low].n)}${lowRs?` และเหตุผลหลักที่ปิดไม่ได้คือ “${esc(lowRs[0])}” (${lowRs[1]} เคส)`:''}${best&&best!==low?` ขณะที่ ${esc(best)} ปิดได้ ${pf(A.type[best].ok/A.type[best].n)} จาก ${A.type[best].n} เคส`:''}<span class="m">Mix เคสปิดได้: ${mix.map(x=>esc(x[0])+' '+x[1]).join(' · ')}</span></div>`:''}`;
+
+  // Card 5 root causes
+  const rs=Object.entries(A.rs).sort((a,b)=>b[1]-a[1]);const nNo=A.n-A.ok;const mx=rs.length?rs[0][1]:1;
+  const pers=rs.filter(x=>PERS.has(x[0])).reduce((a,x)=>a+x[1],0);
+  document.getElementById('cRC').innerHTML=`<div class="ch"><span class="eyebrow" style="color:var(--bad)">Root Causes (สาเหตุหลักที่ปิดไม่ได้)</span><h3>${nNo} เคสที่ปิดไม่ได้ แยกตามเหตุผล</h3></div>
+   ${rs.length?`<div class="rc">${rs.map(([k,v])=>{const p=PERS.has(k);return `<span>${esc(k)}<span class="tag ${p?'p':'x'}">${p?'โน้มน้าวได้':'ข้อจำกัด'}</span></span><span class="rb"><i class="${p?'p':'x'}" style="width:${v/mx*100}%"></i></span><span class="v">${v} <small>(${pf(v/nNo,0)})</small></span>`}).join('')}</div>
+   <div class="note bad"><b>${pf(pers/nNo)}</b> ของเคสที่ปิดไม่ได้มาจากทัศนคติ/ความต้องการของลูกค้า (โน้มน้าวได้) · อีก <b>${pf(1-pers/nNo)}</b> เป็นข้อจำกัด BL / เอกสาร / สินเชื่อ / ชาวต่างชาติ</div>`:'<div class="note">ไม่มีเคสที่ปิดไม่ได้ในมุมมองนี้</div>'}`;
+
+  // Ranking
+  const ord=[...SHOPS].sort((a,b)=>SS[b.c].ach-SS[a.c].ach);
+  document.getElementById('rank').innerHTML=`<thead><tr><th>#</th><th class="l">สาขา</th><th>Target</th><th>Actual</th><th>Gap</th><th>%Ach</th><th>นำเสนอ</th><th>ปิดได้</th><th>% Close</th><th>ARPU</th><th class="l">เหตุผลอันดับ 1</th></tr></thead><tbody>
+   ${ord.map((s,i)=>{const x=SS[s.c];return `<tr class="shop-row${codes.has(s.c)&&scope.k!=='area'?' sel':''}" tabindex="0" data-c="${s.c}"><td>${i+1}</td><td class="l">${esc(s.n)}<span class="cell-sub">${typeLabel(s.t)}${s.frm?' · FRM '+esc(s.frm.split(' ')[0]):''}</span></td><td>${nf(s.tg)}</td><td>${nf(x.rev)}</td><td class="${x.gap>=0?'g':'r'}">${sg(x.gap)}</td><td><span class="chip ${cls(x.ach)}">${pf(x.ach)}</span></td><td>${x.n}</td><td>${x.ok}</td><td class="${x.rate>=AREA.rate?'g':'r'}">${pf(x.rate)}</td><td>${nf(x.arpu)}</td><td class="l mini">${x.top?esc(x.top[0])+' ('+x.top[1]+')':'–'}</td></tr>`}).join('')}
+   <tr class="total"><td></td><td class="l">รวม Area</td><td>${nf(AREA.tg)}</td><td>${nf(AREA.rev)}</td><td class="${AREA.gap>=0?'g':'r'}">${sg(AREA.gap)}</td><td><span class="chip ${cls(AREA.ach)}">${pf(AREA.ach)}</span></td><td>${AREA.n}</td><td>${AREA.ok}</td><td>${pf(AREA.rate)}</td><td>${nf(AREA.arpu)}</td><td></td></tr></tbody>`;
+  document.querySelectorAll('#rank tr.shop-row').forEach(tr=>{const go=()=>setScope(scope.k==='shop'&&scope.c===tr.dataset.c?{k:'area'}:{k:'shop',c:tr.dataset.c});tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}}});
+
+  // Action plan
+  document.getElementById('planScope').textContent='· '+(scope.k==='area'?'ระดับ Area':scope.k==='frm'?'ระดับ FRM':'ระดับสาขา');
+  const acts=[];const arpu=A.arpu||AREA.arpu;
+  if(scope.k!=='shop'&&top3.length){acts.push(['Focus สาขา Gap ใหญ่',`<b>${top3.map(s=>esc(s.n)).join(', ')}</b> ${top3.length>1?`คิดเป็น ${pf(t3/negSum,0)} ของ Gap ติดลบ`:`Gap ${sg(t3)}`} · ต้องปิดเพิ่มราว <b>${Math.ceil(-t3/arpu)} เคส</b> ที่ ARPU ${nf(arpu)} บาท ให้ AM ลงพื้นที่/โทรติดตามรายชั่วโมง และตั้งเป้ารายพนักงาน`])}
+  else if(scope.k==='shop'){const s=SS[scope.c];acts.push([s.gap<0?'ปิด Gap ของสาขา':'รักษาโมเมนตัม',s.gap<0?`Gap <b>${sg(s.gap)}</b> บาท ต้องปิดเพิ่มราว <b>${Math.ceil(-s.gap/arpu)} เคส</b> · ตั้งเป้ารายพนักงานรายชั่วโมงและติดตามทุกช่วงพัก`:`ทำได้ <b>${pf(s.ach)}</b> ของเป้า · แชร์วิธีขายให้สาขาอื่นในพื้นที่ และขยับ ARPU จาก ${nf(s.arpu)} บาทด้วยแพ็กเกจที่สูงขึ้น`])}
+  const prepaid=(A.rs['ใช้เติมเงิน รู้สึกประหยัดกว่า']||0), low_use=(A.rs['ใช้งานน้อยเลยไม่อยากใช้รายเดือน']||0), pkg=(A.rs['Package รายเดือนยังไม่ถูกใจ']||0);
+  const prices=Object.entries(A.price).sort((a,b)=>b[1]-a[1]).slice(0,2).map(x=>nf(+x[0]));
+  if(prepaid+low_use+pkg)acts.push(['Value Pitch ลูกค้าเติมเงิน',`เหตุผล “ใช้เติมเงินประหยัดกว่า / ใช้งานน้อย / แพ็กไม่ถูกใจ” รวม <b>${prepaid+low_use+pkg} เคส</b> · ทำสคริปต์เทียบค่าเติมเงินต่อเดือนกับแพ็กที่ขายดี${prices.length?` (${prices.join(' / ')} บาท)`:''} และ brief ทุกสาขาก่อนเปิดร้าน`]);
+  const mg=A.type['Migrate'],old=A.rs['ลูกค้าใช้เบอร์เดิม']||0;
+  if(mg)acts.push(['ดัน Migrate / คงเบอร์เดิม',`Migrate นำเสนอ ${mg.n} เคส ปิดได้ <b>${pf(mg.ok/mg.n)}</b>${old?` · ลูกค้า <b>${old} เคส</b>ไม่อยากเปลี่ยนเบอร์ ให้เปลี่ยนไปเสนอ Migrate/MNP ใช้เบอร์เดิม`:''} · เน้นจุดขาย “เบอร์เดิม ได้สิทธิ์รายเดือน”`]);
+  const bl=(A.rs['ลูกค้าเป็น BL True']||0)+(A.rs['ลูกค้าเป็น BL Dtac']||0), doc=A.rs['ติดปัญหาเรื่องเอกสาร']||0, cr=A.rs['สมัครสินเชื่อไม่ผ่าน']||0;
+  if(bl+doc+cr)acts.push(['คัดกรอง BL + Checklist เอกสาร',`BL True/Dtac <b>${bl} เคส</b> · เอกสาร ${doc} เคส${cr?` · สินเชื่อไม่ผ่าน ${cr} เคส`:''} · เช็กสถานะ BL และเอกสารตั้งแต่ต้น แล้วใช้เวลาที่ประหยัดได้ไปกับลูกค้าที่สมัครได้ (ลูกค้า BL ให้เสนอ Prepaid/Device แทน)`]);
+  if(scope.k==='shop'){const s=SS[scope.c];acts.push(['Coaching Close Rate',`% ปิดการขายสาขา <b>${pf(s.rate)}</b> ${s.rate<AREA.rate?'ต่ำกว่า':'สูงกว่า'}ค่าเฉลี่ย Area ${pf(AREA.rate)} · ${s.rate<AREA.rate?'role-play การรับมือข้อโต้แย้ง 15 นาทีทุกเช้า':'ใช้พนักงานที่ปิดได้ดีเป็นโค้ชให้สาขาอื่น'}`])}
+  else{const lowS=shops.filter(s=>SS[s.c].n>=10&&SS[s.c].rate<AREA.rate).sort((a,b)=>SS[a.c].rate-SS[b.c].rate);
+    if(lowS.length)acts.push(['Coaching สาขา Close Rate ต่ำ',`<b>${lowS.map(s=>`${esc(s.n)} (${pf(SS[s.c].rate)})`).join(', ')}</b> ต่ำกว่าค่าเฉลี่ย Area ${pf(AREA.rate)} · role-play การรับมือข้อโต้แย้ง 15 นาทีทุกเช้า`])}
+  const s2s=A.ch['Service To Sale'],wi=A.ch['Walk-In'];
+  if(s2s&&wi)acts.push(['เพิ่มคุณภาพ Service To Sale',`Service To Sale คิดเป็น ${pf(s2s.n/A.n,0)} ของเคส ปิดได้ <b>${pf(s2s.ok/s2s.n)}</b> เทียบ Walk-In ${pf(wi.ok/wi.n)} · ให้พนักงานหน้างานบริการเปิดบทสนทนารายเดือนทุกคิว และส่งต่อผู้ขายทันที`]);
+  document.getElementById('acts').innerHTML=acts.slice(0,6).map((a,i)=>`<div class="act"><h3><span>${i+1}</span>${a[0]}</h3><p>${a[1]}</p></div>`).join('');
+  const goal=Math.ceil((A.rate*100+0.01)/5)*5;
+  document.getElementById('foot').innerHTML=`<span class="num">Battle 12–13 ต.ค. · ${esc(nm)} ปิดได้ ${nf(A.rev)} / ${nf(A.tg)} บาท = <b class="${cls(A.ach)}">${pf(A.ach)}</b> (Gap ${sg(A.gap)}) · % ปิดการขาย ${pf(A.rate)} · ข้อเสนอเป้ารอบถัดไป: % ปิดการขาย ≥ ${goal}%</span><span class="badge">Battle Result</span>`;
+}
+// theme
+const root=document.documentElement;
+try{const th=localStorage.getItem('bma2theme');if(th)root.dataset.theme=th}catch(e){}
+const SUN='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor" fill-opacity=".15"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>';
+const MOON='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" fill="currentColor" fill-opacity=".15"/></svg>';
+const mq=matchMedia('(prefers-color-scheme: dark)');
+const isDark=()=>root.dataset.theme?root.dataset.theme==='dark':mq.matches;
+const tb=document.getElementById('themeBtn');
+const paintBtn=()=>{tb.innerHTML=isDark()?SUN:MOON};
+tb.onclick=()=>{root.dataset.theme=isDark()?'light':'dark';try{localStorage.setItem('bma2theme',root.dataset.theme)}catch(e){};paintBtn()};
+try{mq.addEventListener('change',paintBtn)}catch(e){}
+paintBtn();
+render();
+</script>
+</body></html>
